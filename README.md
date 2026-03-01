@@ -77,6 +77,51 @@ npm run dev
 
 The frontend proxies `/api/*` to the backend, so use `fetch("/api/...")` from the app.
 
+## AI (Mistral)
+
+The app can generate portfolio reports and answer questions about your data via Mistral. **This is not investment advice**; the AI is instructed to use only app data and never to recommend buy/sell or predict prices.
+
+### Enabling AI
+
+1. Copy the example env file and set your API key:
+   ```bash
+   cp backend/.env.example backend/.env
+   ```
+2. Edit `backend/.env` and set `MISTRAL_API_KEY` to your [Mistral API key](https://console.mistral.ai/). Optionally set `MISTRAL_MODEL` (default: `mistral-large-latest`).
+3. Restart the backend (e.g. run `npm run dev` again). If the key is missing, AI endpoints return **501** with message `AI disabled: set MISTRAL_API_KEY`.
+
+### Run
+
+Same as above: from the project root with backend venv activated, run:
+
+```bash
+npm run dev
+```
+
+### AI endpoints (curl)
+
+- **Report** (generates a short portfolio report from app data):
+  ```bash
+  curl -X POST http://localhost:8000/ai/report \
+    -H "Content-Type: application/json" \
+    -d "{}"
+  ```
+  Optional body: `{"timeframe": "last month"}`.
+
+- **Chat** (Q&A about your portfolio/bonds/watchlist):
+  ```bash
+  curl -X POST http://localhost:8000/ai/chat \
+    -H "Content-Type: application/json" \
+    -d '{"message": "What is my total exposure to bonds?"}'
+  ```
+
+From the frontend, open **Dashboard** → **AI Report** (or go to http://localhost:3000/ai) to use the report and chat UI.
+
+### Limits and costs
+
+- **Rate limit:** in-memory limit of 20 requests per minute (shared across `/ai/report` and `/ai/chat`). Exceeding returns **429**.
+- **Mistral usage:** API calls consume your Mistral account quota and may incur cost. Check [Mistral pricing](https://mistral.ai/pricing/) and set usage limits in the Mistral console if needed.
+
 ## Lint / type check (optional)
 
 - **Frontend:** from root run `npm run lint` (runs `next lint` in `frontend/`). TypeScript types are checked on build (`npm run build` in `frontend/`).

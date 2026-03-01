@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 
 interface Trade {
@@ -124,7 +125,22 @@ export default function DashboardPage() {
 
   return (
     <main style={{ padding: '2rem', maxWidth: 800 }}>
-      <h1 style={{ marginBottom: '1.5rem' }}>Dashboard</h1>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
+        <h1 style={{ margin: 0 }}>Dashboard</h1>
+        <Link
+          href="/ai"
+          style={{
+            padding: '0.4rem 0.8rem',
+            background: '#2563eb',
+            color: '#fff',
+            borderRadius: 6,
+            textDecoration: 'none',
+            fontSize: '0.9rem',
+          }}
+        >
+          AI Report
+        </Link>
+      </div>
 
       {loading ? (
         <p style={{ color: '#666' }}>Loading…</p>

@@ -3,3 +3,5 @@ uvicorn[standard]
 sqlalchemy
 pydantic
 httpx
+mistralai
+python-dotenv

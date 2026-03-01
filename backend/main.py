@@ -1,18 +1,49 @@
 import csv
+import json
+import os
+import re
 import time
 from datetime import date
 from io import StringIO
 
 import httpx
+from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, HTTPException, Query
 from sqlalchemy.orm import Session
 
 import bonds_math
+from ai import client as ai_client
+from ai import facts as ai_facts
+from ai import prompts as ai_prompts
+from ai.schemas import ChatRequest, ChatResponse, ReportRequest, ReportResponse
 from database import get_db, init_db
 import models
 from schemas import BondCreate, BondResponse, TradeCreate, TradeResponse, WatchCreate, WatchResponse
 
+load_dotenv()
 app = FastAPI(title="BondScope API")
+
+# --- AI rate limit: 20 req/min per process (shared across /ai/report and /ai/chat) ---
+_ai_request_times: list[float] = []
+AI_RATE_LIMIT_PER_MIN = 20
+
+
+def _ai_rate_limit_check() -> None:
+    now = time.monotonic()
+    cutoff = now - 60.0
+    _ai_request_times[:] = [t for t in _ai_request_times if t > cutoff]
+    if len(_ai_request_times) >= AI_RATE_LIMIT_PER_MIN:
+        raise HTTPException(status_code=429, detail="Rate limited")
+    _ai_request_times.append(now)
+
+
+def _parse_ai_json(raw: str) -> dict:
+    """Strip markdown code fence if present and parse JSON."""
+    s = raw.strip()
+    m = re.search(r"```(?:json)?\s*([\s\S]*?)\s*```", s)
+    if m:
+        s = m.group(1).strip()
+    return json.loads(s)
 
 
 @app.on_event("startup")
@@ -201,3 +232,84 @@ def delete_watch(watch_id: int, db: Session = Depends(get_db)):
     db.delete(watch)
     db.commit()
     return {"ok": True}
+
+
+# --- AI (Mistral) ---
+
+
+def _mistral_key() -> str | None:
+    key = os.getenv("MISTRAL_API_KEY")
+    return key.strip() if key else None
+
+
+@app.post("/ai/report", response_model=ReportResponse)
+def ai_report(body: ReportRequest, db: Session = Depends(get_db)):
+    if not _mistral_key():
+        raise HTTPException(status_code=501, detail="AI disabled: set MISTRAL_API_KEY")
+    _ai_rate_limit_check()
+    facts = ai_facts.get_facts(db)
+    model = os.getenv("MISTRAL_MODEL", "mistral-large-latest")
+    user_content = (
+        f"Facts (JSON):\n{json.dumps(facts, default=str)}\n\n"
+        f"Disclaimer to include verbatim: {ai_prompts.DISCLAIMER}\n\n"
+        f"Optional timeframe: {body.timeframe or 'none'}"
+    )
+    messages = [
+        {"role": "system", "content": ai_prompts.SYSTEM_PROMPT + "\n\n" + ai_prompts.REPORT_INSTRUCTIONS},
+        {"role": "user", "content": user_content},
+    ]
+    try:
+        raw = ai_client.mistral_chat(messages, model, api_key=_mistral_key())
+    except ValueError as e:
+        msg = str(e)
+        if "MISTRAL_API_KEY" in msg:
+            raise HTTPException(status_code=401, detail=msg)
+        if "Rate limited" in msg:
+            raise HTTPException(status_code=429, detail=msg)
+        raise HTTPException(status_code=503, detail=msg)
+    try:
+        data = _parse_ai_json(raw)
+        return ReportResponse(
+            summary_md=data.get("summary_md", "No data available for a report."),
+            bullets=data.get("bullets", []) or [],
+            risks=data.get("risks", []) or [],
+            questions_to_check=data.get("questions_to_check", []) or [],
+            disclaimer=data.get("disclaimer", ai_prompts.DISCLAIMER),
+        )
+    except (json.JSONDecodeError, KeyError, TypeError):
+        raise HTTPException(status_code=502, detail="AI returned invalid format")
+
+
+@app.post("/ai/chat", response_model=ChatResponse)
+def ai_chat(body: ChatRequest, db: Session = Depends(get_db)):
+    if not _mistral_key():
+        raise HTTPException(status_code=501, detail="AI disabled: set MISTRAL_API_KEY")
+    _ai_rate_limit_check()
+    facts = ai_facts.get_facts(db)
+    model = os.getenv("MISTRAL_MODEL", "mistral-large-latest")
+    user_content = (
+        f"Facts (JSON):\n{json.dumps(facts, default=str)}\n\n"
+        f"Disclaimer to include verbatim: {ai_prompts.DISCLAIMER}\n\n"
+        f"User question: {body.message}"
+    )
+    messages = [
+        {"role": "system", "content": ai_prompts.SYSTEM_PROMPT + "\n\n" + ai_prompts.CHAT_INSTRUCTIONS},
+        {"role": "user", "content": user_content},
+    ]
+    try:
+        raw = ai_client.mistral_chat(messages, model, api_key=_mistral_key())
+    except ValueError as e:
+        msg = str(e)
+        if "MISTRAL_API_KEY" in msg:
+            raise HTTPException(status_code=401, detail=msg)
+        if "Rate limited" in msg:
+            raise HTTPException(status_code=429, detail=msg)
+        raise HTTPException(status_code=503, detail=msg)
+    try:
+        data = _parse_ai_json(raw)
+        return ChatResponse(
+            answer_md=data.get("answer_md", "No data available."),
+            disclaimer=data.get("disclaimer", ai_prompts.DISCLAIMER),
+        )
+    except (json.JSONDecodeError, KeyError, TypeError):
+        raise HTTPException(status_code=502, detail="AI returned invalid format")
