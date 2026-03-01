@@ -8,7 +8,9 @@
     "dev:backend": "cd backend && python -m uvicorn main:app --reload --port 8000",
     "install": "npm run install:frontend && npm run install:backend",
     "install:frontend": "cd frontend && npm install",
-    "install:backend": "cd backend && pip install -r requirements.txt"
+    "install:backend": "cd backend && pip install -r requirements.txt",
+    "lint": "npm run lint:frontend",
+    "lint:frontend": "cd frontend && npm run lint"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
