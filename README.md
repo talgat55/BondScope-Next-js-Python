@@ -1,40 +1,40 @@
-# YieldDesk
+# BondScope
 
-Монорепо: Next.js (frontend) + FastAPI (backend).
+Monorepo: Next.js (frontend) + FastAPI (backend). Bond and equity portfolio dashboard with YTM, duration, and stock price data.
 
-## Структура
+## Structure
 
 - `frontend/` — Next.js App Router + TypeScript
 - `backend/`  — Python FastAPI + SQLite (SQLAlchemy)
 
-## Установка зависимостей
+## Install dependencies
 
-В корне (для `concurrently`):
+From the repo root (for `concurrently`):
 
 ```bash
 npm install
 ```
 
-Установка фронта и бэка:
+Install frontend and backend:
 
 ```bash
 npm run install
 ```
 
-Либо по отдельности:
+Or separately:
 
 ```bash
 # Frontend
 cd frontend && npm install
 
-# Backend (рекомендуется в виртуальном окружении)
-cd backend && python -m venv .venv && source .venv/bin/activate  # Windows: .venv\Scripts\activate
+# Backend (recommended: use a virtual env)
+cd backend && python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-## Запуск
+## Run
 
-Из корня проекта:
+From the repo root:
 
 ```bash
 npm run dev
@@ -43,4 +43,4 @@ npm run dev
 - Frontend: http://localhost:3000  
 - Backend:  http://localhost:8000  
 
-API с фронта вызывается через прокси: `fetch("/api/...")` → бэкенд на порту 8000.
+Frontend proxies API calls: `fetch("/api/...")` is forwarded to the backend on port 8000.
