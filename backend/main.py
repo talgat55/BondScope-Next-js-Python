@@ -1,11 +1,13 @@
 import csv
 import time
+from datetime import date
 from io import StringIO
 
 import httpx
 from fastapi import Depends, FastAPI, HTTPException, Query
 from sqlalchemy.orm import Session
 
+import bonds_math
 from database import get_db, init_db
 import models
 from schemas import BondCreate, BondResponse, TradeCreate, TradeResponse, WatchCreate, WatchResponse
@@ -143,6 +145,35 @@ def delete_bond(bond_id: int, db: Session = Depends(get_db)):
     db.delete(bond)
     db.commit()
     return {"ok": True}
+
+
+@app.get("/bonds/{bond_id}/metrics")
+def get_bond_metrics(bond_id: int, db: Session = Depends(get_db)):
+    bond = db.get(models.Bond, bond_id)
+    if not bond:
+        raise HTTPException(status_code=404, detail="Bond not found")
+    settlement = date.today()
+    ytm = bonds_math.ytm_from_price_bisection(
+        bond.price, bond.face, bond.coupon_rate, bond.coupon_freq,
+        bond.maturity_date, settlement,
+    )
+    cy = bonds_math.current_yield(bond.face, bond.coupon_rate, bond.price)
+    mac = bonds_math.macaulay_duration(
+        bond.face, bond.coupon_rate, bond.coupon_freq,
+        bond.maturity_date, settlement, ytm,
+    )
+    mod_dur = bonds_math.modified_duration(mac, ytm)
+    cf = bonds_math.cashflows(
+        bond.face, bond.coupon_rate, bond.coupon_freq,
+        bond.maturity_date, settlement,
+    )
+    cashflows_list = [{"date": d.isoformat(), "amount": round(a, 2)} for d, a in cf]
+    return {
+        "ytm": round(ytm, 6),
+        "current_yield": round(cy, 6),
+        "duration": round(mod_dur, 6),
+        "cashflows": cashflows_list,
+    }
 
 
 # --- Watchlist ---
