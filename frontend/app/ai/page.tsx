@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
+import { useLocale } from '../i18n/LocaleContext';
 
 interface ReportResponse {
   summary_md: string;
@@ -25,10 +26,8 @@ interface ChatMessage {
 const api = (path: string, options?: RequestInit) =>
   fetch(`/api${path}`, options);
 
-const DISCLAIMER_TEXT =
-  'This is not investment advice. For educational and informational use only.';
-
 export default function AIPage() {
+  const { t } = useLocale();
   const [tab, setTab] = useState<'report' | 'chat'>('report');
   const [report, setReport] = useState<ReportResponse | null>(null);
   const [reportLoading, setReportLoading] = useState(false);
@@ -49,15 +48,15 @@ export default function AIPage() {
         body: JSON.stringify({}),
       });
       if (res.status === 501) {
-        setReportError('AI disabled: set MISTRAL_API_KEY');
+        setReportError(t.ai.errorDisabled);
         return;
       }
       if (res.status === 429) {
-        setReportError('Rate limited. Try again later.');
+        setReportError(t.ai.errorRateLimit);
         return;
       }
       if (res.status === 401) {
-        setReportError('Invalid MISTRAL_API_KEY');
+        setReportError(t.ai.errorInvalidKey);
         return;
       }
       if (!res.ok) {
@@ -68,7 +67,7 @@ export default function AIPage() {
       const data: ReportResponse = await res.json();
       setReport(data);
     } catch (e) {
-      setReportError(e instanceof Error ? e.message : 'Request failed');
+      setReportError(e instanceof Error ? e.message : t.ai.errorRequestFailed);
     } finally {
       setReportLoading(false);
     }
@@ -88,19 +87,19 @@ export default function AIPage() {
         body: JSON.stringify({ message: msg }),
       });
       if (res.status === 501) {
-        setChatError('AI disabled: set MISTRAL_API_KEY');
+        setChatError(t.ai.errorDisabled);
         setChatMessages((prev) => prev.slice(0, -1));
         setChatInput(msg);
         return;
       }
       if (res.status === 429) {
-        setChatError('Rate limited. Try again later.');
+        setChatError(t.ai.errorRateLimit);
         setChatMessages((prev) => prev.slice(0, -1));
         setChatInput(msg);
         return;
       }
       if (res.status === 401) {
-        setChatError('Invalid MISTRAL_API_KEY');
+        setChatError(t.ai.errorInvalidKey);
         setChatMessages((prev) => prev.slice(0, -1));
         setChatInput(msg);
         return;
@@ -118,7 +117,7 @@ export default function AIPage() {
         { role: 'assistant', text: data.answer_md, disclaimer: data.disclaimer },
       ]);
     } catch (e) {
-      setChatError(e instanceof Error ? e.message : 'Request failed');
+      setChatError(e instanceof Error ? e.message : t.ai.errorRequestFailed);
       setChatMessages((prev) => prev.slice(0, -1));
       setChatInput(msg);
     } finally {
@@ -129,7 +128,7 @@ export default function AIPage() {
   return (
     <>
       <h1 style={{ marginBottom: '1rem', fontSize: '1.75rem', fontWeight: 700 }}>
-        AI
+        {t.ai.title}
       </h1>
       <div className="flex gap-1" style={{ marginBottom: '1.5rem' }}>
         <button
@@ -137,24 +136,24 @@ export default function AIPage() {
           className={tab === 'report' ? 'btn btn-primary' : 'btn btn-ghost'}
           onClick={() => setTab('report')}
         >
-          AI Report
+          {t.ai.reportTab}
         </button>
         <button
           type="button"
           className={tab === 'chat' ? 'btn btn-primary' : 'btn btn-ghost'}
           onClick={() => setTab('chat')}
         >
-          AI Chat
+          {t.ai.chatTab}
         </button>
       </div>
 
       <p className="muted" style={{ marginBottom: '1rem', fontSize: '0.9rem' }}>
-        {DISCLAIMER_TEXT}
+        {t.ai.disclaimer}
       </p>
 
       {tab === 'report' && (
         <section className="card">
-          <h2>Portfolio report</h2>
+          <h2>{t.ai.portfolioReport}</h2>
           <button
             type="button"
             className="btn btn-primary"
@@ -162,7 +161,7 @@ export default function AIPage() {
             disabled={reportLoading}
             style={{ marginBottom: '1rem' }}
           >
-            {reportLoading ? 'Generating…' : 'Generate'}
+            {reportLoading ? t.ai.generating : t.ai.generate}
           </button>
           {reportError && (
             <p className="text-danger" style={{ marginBottom: '0.5rem' }}>
@@ -176,7 +175,7 @@ export default function AIPage() {
               </div>
               {report.bullets.length > 0 && (
                 <>
-                  <h3 style={{ marginBottom: 0.5 }}>Bullets</h3>
+                  <h3 style={{ marginBottom: 0.5 }}>{t.ai.bullets}</h3>
                   <ul style={{ marginBottom: '1rem' }}>
                     {report.bullets.map((b, i) => (
                       <li key={i}>{b}</li>
@@ -186,7 +185,7 @@ export default function AIPage() {
               )}
               {report.risks.length > 0 && (
                 <>
-                  <h3 style={{ marginBottom: 0.5 }}>Risks</h3>
+                  <h3 style={{ marginBottom: 0.5 }}>{t.ai.risks}</h3>
                   <ul style={{ marginBottom: '1rem' }}>
                     {report.risks.map((r, i) => (
                       <li key={i}>{r}</li>
@@ -196,7 +195,7 @@ export default function AIPage() {
               )}
               {report.questions_to_check.length > 0 && (
                 <>
-                  <h3 style={{ marginBottom: 0.5 }}>Questions to check</h3>
+                  <h3 style={{ marginBottom: 0.5 }}>{t.ai.questionsToCheck}</h3>
                   <ul style={{ marginBottom: '1rem' }}>
                     {report.questions_to_check.map((q, i) => (
                       <li key={i}>{q}</li>
@@ -214,7 +213,7 @@ export default function AIPage() {
 
       {tab === 'chat' && (
         <section className="card">
-          <h2>Ask about your data</h2>
+          <h2>{t.ai.askAboutData}</h2>
           {chatError && (
             <p className="text-danger" style={{ marginBottom: '0.5rem' }}>
               {chatError}
@@ -233,7 +232,7 @@ export default function AIPage() {
           >
             {chatMessages.length === 0 && (
               <p className="muted" style={{ fontSize: '0.9rem' }}>
-                Ask a question about your portfolio, bonds, or watchlist.
+                {t.ai.askPlaceholder}
               </p>
             )}
             {chatMessages.map((m, i) => (
@@ -251,7 +250,7 @@ export default function AIPage() {
                     color: m.role === 'user' ? 'var(--accent)' : 'var(--success)',
                   }}
                 >
-                  {m.role === 'user' ? 'You' : 'AI'}
+                  {m.role === 'user' ? t.ai.you : t.ai.ai}
                 </span>
                 <div
                   style={{
@@ -289,7 +288,7 @@ export default function AIPage() {
                   handleSendChat();
                 }
               }}
-              placeholder="Your question..."
+              placeholder={t.ai.questionPlaceholder}
               rows={2}
               style={{ flex: 1, resize: 'vertical' }}
             />
@@ -299,7 +298,7 @@ export default function AIPage() {
               onClick={handleSendChat}
               disabled={chatLoading || !chatInput.trim()}
             >
-              {chatLoading ? 'Sending…' : 'Send'}
+              {chatLoading ? t.ai.sending : t.ai.send}
             </button>
           </div>
         </section>

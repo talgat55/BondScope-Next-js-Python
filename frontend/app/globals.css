@@ -74,6 +74,20 @@ a:hover {
   color: var(--accent);
   background: transparent;
 }
+.lang-switcher {
+  margin-left: auto;
+  display: flex;
+  gap: 0.25rem;
+}
+.lang-switcher .btn-ghost {
+  padding: 0.35rem 0.6rem;
+  font-size: 0.8rem;
+  min-width: 2.25rem;
+}
+.lang-switcher .btn-ghost.active {
+  background: var(--bg-elevated);
+  color: var(--accent);
+}
 
 .app-main {
   max-width: 960px;

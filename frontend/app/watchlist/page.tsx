@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import { useLocale } from '../i18n/LocaleContext';
 
 interface WatchItem {
   id: number;
@@ -18,6 +19,7 @@ const api = (path: string, options?: RequestInit) =>
   fetch(`/api${path}`, options);
 
 export default function WatchlistPage() {
+  const { t } = useLocale();
   const [items, setItems] = useState<WatchItem[]>([]);
   const [rows, setRows] = useState<PriceRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -106,40 +108,40 @@ export default function WatchlistPage() {
   return (
     <>
       <h1 style={{ marginBottom: '1.5rem', fontSize: '1.75rem', fontWeight: 700 }}>
-        Watchlist
+        {t.watchlist.title}
       </h1>
 
       <section className="card">
-        <h2>Add ticker</h2>
+        <h2>{t.watchlist.addTicker}</h2>
         <form onSubmit={handleAdd} className="flex items-center gap-1">
           <input
             type="text"
             className="input"
             value={formTicker}
             onChange={(e) => setFormTicker(e.target.value)}
-            placeholder="e.g. AAPL.US"
+            placeholder={t.watchlist.placeholder}
             style={{ width: 180 }}
           />
           <button type="submit" className="btn btn-primary" disabled={submitting}>
-            {submitting ? 'Adding…' : 'Add'}
+            {submitting ? t.watchlist.adding : t.watchlist.add}
           </button>
         </form>
       </section>
 
       <section className="card">
-        <h2>Tickers</h2>
+        <h2>{t.watchlist.tickers}</h2>
         {loading ? (
-          <p className="muted">Loading…</p>
+          <p className="muted">{t.watchlist.loading}</p>
         ) : items.length === 0 ? (
-          <p className="muted">No tickers in watchlist. Add one above.</p>
+          <p className="muted">{t.watchlist.noTickers}</p>
         ) : (
           <div className="table-wrap">
             <table>
               <thead>
                 <tr>
-                  <th>Ticker</th>
-                  <th>Price</th>
-                  <th>Signal</th>
+                  <th>{t.watchlist.ticker}</th>
+                  <th>{t.watchlist.price}</th>
+                  <th>{t.watchlist.signal}</th>
                   <th></th>
                 </tr>
               </thead>
@@ -150,7 +152,7 @@ export default function WatchlistPage() {
                     <td>{r.price != null ? r.price.toFixed(2) : '—'}</td>
                     <td>
                       <span className={r.signal === 'ok' ? 'text-success' : 'text-danger'}>
-                        {r.signal === 'ok' ? 'ok' : 'price unavailable'}
+                        {r.signal === 'ok' ? t.watchlist.signalOk : t.watchlist.signalUnavailable}
                       </span>
                     </td>
                     <td>
@@ -160,7 +162,7 @@ export default function WatchlistPage() {
                         onClick={() => handleDelete(r.id)}
                         disabled={deletingId === r.id}
                       >
-                        {deletingId === r.id ? '…' : 'Delete'}
+                        {deletingId === r.id ? '…' : t.watchlist.delete}
                       </button>
                     </td>
                   </tr>

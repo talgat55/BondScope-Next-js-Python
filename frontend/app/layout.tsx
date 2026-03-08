@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import './globals.css';
+import { LocaleProvider } from './i18n/LocaleContext';
+import AppShell from './components/AppShell';
 
 export const metadata: Metadata = {
   title: 'BondScope',
@@ -13,7 +14,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="ru" suppressHydrationWarning>
       <head>
         <link
           rel="stylesheet"
@@ -21,17 +22,9 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <nav className="app-nav">
-          <Link href="/" className="brand">
-            BondScope
-          </Link>
-          <Link href="/">Dashboard</Link>
-          <Link href="/portfolio">Portfolio</Link>
-          <Link href="/bonds">Bonds</Link>
-          <Link href="/watchlist">Watchlist</Link>
-          <Link href="/ai">AI</Link>
-        </nav>
-        <main className="app-main">{children}</main>
+        <LocaleProvider>
+          <AppShell>{children}</AppShell>
+        </LocaleProvider>
       </body>
     </html>
   );

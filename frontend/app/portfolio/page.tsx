@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import { useLocale } from '../i18n/LocaleContext';
 
 interface Trade {
   id: number;
@@ -23,6 +24,7 @@ const api = (path: string, options?: RequestInit) =>
   fetch(`/api${path}`, options);
 
 export default function PortfolioPage() {
+  const { t } = useLocale();
   const [trades, setTrades] = useState<Trade[]>([]);
   const [positions, setPositions] = useState<Position[]>([]);
   const [loading, setLoading] = useState(true);
@@ -151,18 +153,18 @@ export default function PortfolioPage() {
   return (
     <>
       <h1 style={{ marginBottom: '1.5rem', fontSize: '1.75rem', fontWeight: 700 }}>
-        Portfolio
+        {t.portfolio.title}
       </h1>
 
       <section className="card">
-        <h2>Add trade</h2>
+        <h2>{t.portfolio.addTrade}</h2>
         <form
           onSubmit={handleSubmit}
           className="flex flex-wrap items-center gap-2"
           style={{ alignItems: 'flex-end' }}
         >
           <label style={{ width: 120 }}>
-            Ticker
+            {t.portfolio.ticker}
             <input
               type="text"
               className="input"
@@ -172,7 +174,7 @@ export default function PortfolioPage() {
             />
           </label>
           <label style={{ width: 90 }}>
-            Qty
+            {t.portfolio.qty}
             <input
               type="number"
               className="input"
@@ -183,7 +185,7 @@ export default function PortfolioPage() {
             />
           </label>
           <label style={{ width: 90 }}>
-            Buy price
+            {t.portfolio.buyPrice}
             <input
               type="number"
               className="input"
@@ -194,7 +196,7 @@ export default function PortfolioPage() {
             />
           </label>
           <label style={{ width: 140 }}>
-            Buy date
+            {t.portfolio.buyDate}
             <input
               type="date"
               className="input"
@@ -203,23 +205,23 @@ export default function PortfolioPage() {
             />
           </label>
           <button type="submit" className="btn btn-primary" disabled={submitting}>
-            {submitting ? 'Adding…' : 'Add'}
+            {submitting ? t.portfolio.adding : t.portfolio.add}
           </button>
         </form>
       </section>
 
       {positions.length > 0 && (
         <section className="card">
-          <h2>Positions (by ticker)</h2>
+          <h2>{t.portfolio.positionsByTicker}</h2>
           <div className="table-wrap">
             <table>
               <thead>
                 <tr>
-                  <th>Ticker</th>
-                  <th>Qty</th>
-                  <th>Avg cost</th>
-                  <th>Current price</th>
-                  <th>P&amp;L</th>
+                  <th>{t.portfolio.ticker}</th>
+                  <th>{t.portfolio.qty}</th>
+                  <th>{t.portfolio.avgCost}</th>
+                  <th>{t.portfolio.currentPrice}</th>
+                  <th>{t.portfolio.pnl}</th>
                 </tr>
               </thead>
               <tbody>
@@ -247,38 +249,38 @@ export default function PortfolioPage() {
       )}
 
       <section className="card">
-        <h2>Trades</h2>
+        <h2>{t.portfolio.trades}</h2>
         {loading ? (
-          <p className="muted">Loading…</p>
+          <p className="muted">{t.portfolio.loading}</p>
         ) : trades.length === 0 ? (
-          <p className="muted">No trades yet. Add one above.</p>
+          <p className="muted">{t.portfolio.noTradesYet}</p>
         ) : (
           <div className="table-wrap">
             <table>
               <thead>
                 <tr>
-                  <th>Ticker</th>
-                  <th>Qty</th>
-                  <th>Buy price</th>
-                  <th>Buy date</th>
+                  <th>{t.portfolio.ticker}</th>
+                  <th>{t.portfolio.qty}</th>
+                  <th>{t.portfolio.buyPrice}</th>
+                  <th>{t.portfolio.date}</th>
                   <th></th>
                 </tr>
               </thead>
               <tbody>
-                {trades.map((t) => (
-                  <tr key={t.id}>
-                    <td>{t.ticker}</td>
-                    <td>{t.quantity}</td>
-                    <td>{t.buy_price.toFixed(2)}</td>
-                    <td>{t.buy_date}</td>
+                {trades.map((tr) => (
+                  <tr key={tr.id}>
+                    <td>{tr.ticker}</td>
+                    <td>{tr.quantity}</td>
+                    <td>{tr.buy_price.toFixed(2)}</td>
+                    <td>{tr.buy_date}</td>
                     <td>
                       <button
                         type="button"
                         className="btn btn-danger"
-                        onClick={() => handleDelete(t.id)}
-                        disabled={deletingId === t.id}
+                        onClick={() => handleDelete(tr.id)}
+                        disabled={deletingId === tr.id}
                       >
-                        {deletingId === t.id ? '…' : 'Delete'}
+                        {deletingId === tr.id ? '…' : t.portfolio.delete}
                       </button>
                     </td>
                   </tr>

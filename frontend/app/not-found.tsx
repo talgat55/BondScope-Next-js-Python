@@ -1,6 +1,10 @@
+'use client';
+
 import Link from 'next/link';
+import { useLocale } from './i18n/LocaleContext';
 
 export default function NotFound() {
+  const { t } = useLocale();
   return (
     <main
       style={{
@@ -14,10 +18,10 @@ export default function NotFound() {
         404
       </h1>
       <p className="muted" style={{ marginBottom: '1.5rem' }}>
-        Page not found.
+        {t.notFound.pageNotFound}
       </p>
       <Link href="/" className="btn btn-primary">
-        Back to Dashboard
+        {t.notFound.backHome}
       </Link>
     </main>
   );

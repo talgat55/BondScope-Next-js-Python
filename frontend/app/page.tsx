@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
+import { useLocale } from './i18n/LocaleContext';
 
 interface Trade {
   id: number;
@@ -31,6 +32,7 @@ const api = (path: string, options?: RequestInit) =>
   fetch(`/api${path}`, options);
 
 export default function DashboardPage() {
+  const { t } = useLocale();
   const [totalValue, setTotalValue] = useState<number>(0);
   const [stocksValue, setStocksValue] = useState<number>(0);
   const [bondsValue, setBondsValue] = useState<number>(0);
@@ -122,29 +124,29 @@ export default function DashboardPage() {
     <>
       <div className="flex items-center gap-2" style={{ marginBottom: '1.5rem' }}>
         <h1 style={{ margin: 0, fontSize: '1.75rem', fontWeight: 700 }}>
-          Dashboard
+          {t.dashboard.title}
         </h1>
         <Link href="/ai" className="btn btn-primary">
-          AI Report
+          {t.dashboard.aiReport}
         </Link>
       </div>
 
       {loading ? (
-        <p className="muted">Loading…</p>
+        <p className="muted">{t.dashboard.loading}</p>
       ) : (
         <>
           <section className="card">
-            <h2>Total value</h2>
+            <h2>{t.dashboard.totalValue}</h2>
             <p style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '0.25rem' }}>
               {total.toFixed(2)}
             </p>
             <p className="muted" style={{ fontSize: '0.9rem' }}>
-              Stocks: {stocksValue.toFixed(2)} · Bonds: {bondsValue.toFixed(2)}
+              {t.dashboard.stocks}: {stocksValue.toFixed(2)} · {t.dashboard.bonds}: {bondsValue.toFixed(2)}
             </p>
           </section>
 
           <section className="card">
-            <h2>Allocation (stocks vs bonds)</h2>
+            <h2>{t.dashboard.allocation}</h2>
             {total > 0 ? (
               <>
                 <div
@@ -163,7 +165,7 @@ export default function DashboardPage() {
                       background: 'var(--accent)',
                       transition: 'width 0.2s',
                     }}
-                    title={`Stocks ${stocksPct.toFixed(1)}%`}
+                    title={`${t.dashboard.stocks} ${stocksPct.toFixed(1)}%`}
                   />
                   <div
                     style={{
@@ -171,38 +173,38 @@ export default function DashboardPage() {
                       background: 'var(--success)',
                       transition: 'width 0.2s',
                     }}
-                    title={`Bonds ${bondsPct.toFixed(1)}%`}
+                    title={`${t.dashboard.bonds} ${bondsPct.toFixed(1)}%`}
                   />
                 </div>
                 <div className="flex gap-2 muted" style={{ fontSize: '0.9rem' }}>
-                  <span style={{ color: 'var(--accent)' }}>■ Stocks {stocksPct.toFixed(1)}%</span>
-                  <span style={{ color: 'var(--success)' }}>■ Bonds {bondsPct.toFixed(1)}%</span>
+                  <span style={{ color: 'var(--accent)' }}>■ {t.dashboard.stocks} {stocksPct.toFixed(1)}%</span>
+                  <span style={{ color: 'var(--success)' }}>■ {t.dashboard.bonds} {bondsPct.toFixed(1)}%</span>
                 </div>
               </>
             ) : (
-              <p className="muted">No positions. Add trades and bonds.</p>
+              <p className="muted">{t.dashboard.noPositionsAdd}</p>
             )}
           </section>
 
           <section className="card">
-            <h2>Top positions</h2>
+            <h2>{t.dashboard.topPositions}</h2>
             {topPositions.length === 0 ? (
-              <p className="muted">No positions yet.</p>
+              <p className="muted">{t.dashboard.noPositionsYet}</p>
             ) : (
               <div className="table-wrap">
                 <table>
                   <thead>
                     <tr>
-                      <th>Name</th>
-                      <th>Type</th>
-                      <th>Value</th>
+                      <th>{t.dashboard.name}</th>
+                      <th>{t.dashboard.type}</th>
+                      <th>{t.dashboard.value}</th>
                     </tr>
                   </thead>
                   <tbody>
                     {topPositions.map((p, i) => (
                       <tr key={`${p.type}-${p.name}-${i}`}>
                         <td>{p.name}</td>
-                        <td>{p.type}</td>
+                        <td>{p.type === 'stock' ? t.dashboard.typeStock : t.dashboard.typeBond}</td>
                         <td>{p.value.toFixed(2)}</td>
                       </tr>
                     ))}

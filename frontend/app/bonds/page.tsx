@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import { useLocale } from '../i18n/LocaleContext';
 
 interface Bond {
   id: number;
@@ -23,6 +24,7 @@ const api = (path: string, options?: RequestInit) =>
   fetch(`/api${path}`, options);
 
 export default function BondsPage() {
+  const { t } = useLocale();
   const [bonds, setBonds] = useState<Bond[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState<number | null>(null);
@@ -121,28 +123,28 @@ export default function BondsPage() {
   return (
     <>
       <h1 style={{ marginBottom: '1.5rem', fontSize: '1.75rem', fontWeight: 700 }}>
-        Bonds
+        {t.bonds.title}
       </h1>
 
       <section className="card">
-        <h2>Add bond</h2>
+        <h2>{t.bonds.addBond}</h2>
         <form
           onSubmit={handleSubmit}
           className="flex flex-wrap items-center gap-2"
           style={{ alignItems: 'flex-end', maxWidth: 720 }}
         >
           <label style={{ minWidth: 140 }}>
-            Name
+            {t.bonds.name}
             <input
               type="text"
               className="input"
               value={form.name}
               onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-              placeholder="Bond name"
+              placeholder={t.bonds.placeholderName}
             />
           </label>
           <label style={{ width: 90 }}>
-            Face
+            {t.bonds.face}
             <input
               type="number"
               className="input"
@@ -153,7 +155,7 @@ export default function BondsPage() {
             />
           </label>
           <label style={{ width: 100 }}>
-            Coupon %
+            {t.bonds.couponPct}
             <input
               type="number"
               className="input"
@@ -166,7 +168,7 @@ export default function BondsPage() {
             />
           </label>
           <label style={{ width: 80 }}>
-            Freq
+            {t.bonds.freq}
             <input
               type="number"
               className="input"
@@ -179,7 +181,7 @@ export default function BondsPage() {
             />
           </label>
           <label style={{ width: 80 }}>
-            Price
+            {t.bonds.price}
             <input
               type="number"
               className="input"
@@ -190,7 +192,7 @@ export default function BondsPage() {
             />
           </label>
           <label style={{ width: 140 }}>
-            Maturity
+            {t.bonds.maturity}
             <input
               type="date"
               className="input"
@@ -201,28 +203,28 @@ export default function BondsPage() {
             />
           </label>
           <button type="submit" className="btn btn-primary" disabled={submitting}>
-            {submitting ? 'Adding…' : 'Add'}
+            {submitting ? t.bonds.adding : t.bonds.add}
           </button>
         </form>
       </section>
 
       <section className="card">
-        <h2>Bonds</h2>
+        <h2>{t.bonds.title}</h2>
         {loading ? (
-          <p className="muted">Loading…</p>
+          <p className="muted">{t.bonds.loading}</p>
         ) : bonds.length === 0 ? (
-          <p className="muted">No bonds yet. Add one above.</p>
+          <p className="muted">{t.bonds.noBondsYet}</p>
         ) : (
           <div className="table-wrap">
             <table>
               <thead>
                 <tr>
-                  <th>Name</th>
-                  <th>Face</th>
-                  <th>Coupon %</th>
-                  <th>Freq</th>
-                  <th>Price</th>
-                  <th>Maturity</th>
+                  <th>{t.bonds.name}</th>
+                  <th>{t.bonds.face}</th>
+                  <th>{t.bonds.couponPct}</th>
+                  <th>{t.bonds.freq}</th>
+                  <th>{t.bonds.price}</th>
+                  <th>{t.bonds.maturity}</th>
                 </tr>
               </thead>
               <tbody>
@@ -249,23 +251,23 @@ export default function BondsPage() {
 
       {selectedBond && (
         <section className="card">
-          <h2>Metrics: {selectedBond.name}</h2>
+          <h2>{t.bonds.metrics}: {selectedBond.name}</h2>
           {metricsLoading ? (
-            <p className="muted">Loading metrics…</p>
+            <p className="muted">{t.bonds.loadingMetrics}</p>
           ) : metrics ? (
             <>
               <div className="flex flex-wrap gap-2" style={{ marginBottom: '1rem' }}>
-                <span><strong>YTM:</strong> {(metrics.ytm * 100).toFixed(2)}%</span>
-                <span><strong>Current yield:</strong> {(metrics.current_yield * 100).toFixed(2)}%</span>
-                <span><strong>Duration:</strong> {metrics.duration.toFixed(4)} yrs</span>
+                <span><strong>{t.bonds.ytm}:</strong> {(metrics.ytm * 100).toFixed(2)}%</span>
+                <span><strong>{t.bonds.currentYield}:</strong> {(metrics.current_yield * 100).toFixed(2)}%</span>
+                <span><strong>{t.bonds.duration}:</strong> {metrics.duration.toFixed(4)} {t.bonds.durationYrs}</span>
               </div>
-              <h3 style={{ marginBottom: '0.5rem' }}>Cashflows</h3>
+              <h3 style={{ marginBottom: '0.5rem' }}>{t.bonds.cashflows}</h3>
               <div className="table-wrap" style={{ maxWidth: 400 }}>
                 <table>
                   <thead>
                     <tr>
-                      <th>Date</th>
-                      <th>Amount</th>
+                      <th>{t.bonds.date}</th>
+                      <th>{t.bonds.amount}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -280,7 +282,7 @@ export default function BondsPage() {
               </div>
             </>
           ) : (
-            <p className="muted">Could not load metrics.</p>
+            <p className="muted">{t.bonds.couldNotLoadMetrics}</p>
           )}
         </section>
       )}
