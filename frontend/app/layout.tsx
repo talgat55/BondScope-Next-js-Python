@@ -7,20 +7,6 @@ export const metadata: Metadata = {
   description: 'Bond and equity portfolio dashboard',
 };
 
-const navStyle = {
-  display: 'flex' as const,
-  gap: '0.75rem',
-  padding: '0.75rem 1rem',
-  background: '#f5f5f5',
-  borderBottom: '1px solid #eee',
-  marginBottom: 0,
-};
-const linkStyle = {
-  color: '#2563eb',
-  textDecoration: 'none' as const,
-  fontSize: '0.9rem',
-};
-
 export default function RootLayout({
   children,
 }: {
@@ -28,15 +14,24 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap"
+        />
+      </head>
       <body>
-        <nav style={navStyle}>
-          <Link href="/" style={linkStyle}>Dashboard</Link>
-          <Link href="/portfolio" style={linkStyle}>Portfolio</Link>
-          <Link href="/bonds" style={linkStyle}>Bonds</Link>
-          <Link href="/watchlist" style={linkStyle}>Watchlist</Link>
-          <Link href="/ai" style={linkStyle}>AI</Link>
+        <nav className="app-nav">
+          <Link href="/" className="brand">
+            BondScope
+          </Link>
+          <Link href="/">Dashboard</Link>
+          <Link href="/portfolio">Portfolio</Link>
+          <Link href="/bonds">Bonds</Link>
+          <Link href="/watchlist">Watchlist</Link>
+          <Link href="/ai">AI</Link>
         </nav>
-        {children}
+        <main className="app-main">{children}</main>
       </body>
     </html>
   );

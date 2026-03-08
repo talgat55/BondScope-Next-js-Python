@@ -47,14 +47,12 @@ export default function DashboardPage() {
       const trades: Trade[] = tradesRes.ok ? await tradesRes.json() : [];
       const bonds: Bond[] = bondsRes.ok ? await bondsRes.json() : [];
 
-      // Aggregate stock positions by ticker
       const byTicker = new Map<string, number>();
       for (const t of trades) {
         byTicker.set(t.ticker, (byTicker.get(t.ticker) ?? 0) + t.quantity);
       }
       const tickers = Array.from(byTicker.keys());
 
-      // Fetch current prices for stock tickers
       const priceMap = new Map<string, number>();
       if (tickers.length > 0) {
         const results = await Promise.all(
@@ -76,7 +74,6 @@ export default function DashboardPage() {
         });
       }
 
-      // Stock values: qty * current price (or 0 if no price)
       let totalStocks = 0;
       const stockPositions: TopPosition[] = [];
       for (const ticker of tickers) {
@@ -87,7 +84,6 @@ export default function DashboardPage() {
         if (value > 0) stockPositions.push({ name: ticker, value, type: 'stock' });
       }
 
-      // Bond values: use entered price per bond
       const totalBonds = bonds.reduce((sum, b) => sum + b.price, 0);
       const bondPositions: TopPosition[] = bonds.map((b) => ({
         name: b.name,
@@ -99,7 +95,6 @@ export default function DashboardPage() {
       setBondsValue(totalBonds);
       setTotalValue(totalStocks + totalBonds);
 
-      // Top positions by value (desc)
       const all = [...stockPositions, ...bondPositions].sort(
         (a, b) => b.value - a.value
       );
@@ -124,44 +119,32 @@ export default function DashboardPage() {
   const bondsPct = total > 0 ? (bondsValue / total) * 100 : 0;
 
   return (
-    <main style={{ padding: '2rem', maxWidth: 800 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-        <h1 style={{ margin: 0 }}>Dashboard</h1>
-        <Link
-          href="/ai"
-          style={{
-            padding: '0.4rem 0.8rem',
-            background: '#2563eb',
-            color: '#fff',
-            borderRadius: 6,
-            textDecoration: 'none',
-            fontSize: '0.9rem',
-          }}
-        >
+    <>
+      <div className="flex items-center gap-2" style={{ marginBottom: '1.5rem' }}>
+        <h1 style={{ margin: 0, fontSize: '1.75rem', fontWeight: 700 }}>
+          Dashboard
+        </h1>
+        <Link href="/ai" className="btn btn-primary">
           AI Report
         </Link>
       </div>
 
       {loading ? (
-        <p style={{ color: '#666' }}>Loading…</p>
+        <p className="muted">Loading…</p>
       ) : (
         <>
-          <section style={{ marginBottom: '2rem' }}>
-            <h2 style={{ marginBottom: '0.5rem', fontSize: '1.1rem' }}>
-              Total value
-            </h2>
-            <p style={{ fontSize: '1.75rem', fontWeight: 700 }}>
+          <section className="card">
+            <h2>Total value</h2>
+            <p style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '0.25rem' }}>
               {total.toFixed(2)}
             </p>
-            <p style={{ color: '#666', fontSize: '0.9rem' }}>
+            <p className="muted" style={{ fontSize: '0.9rem' }}>
               Stocks: {stocksValue.toFixed(2)} · Bonds: {bondsValue.toFixed(2)}
             </p>
           </section>
 
-          <section style={{ marginBottom: '2rem' }}>
-            <h2 style={{ marginBottom: '0.75rem', fontSize: '1.1rem' }}>
-              Allocation (stocks vs bonds)
-            </h2>
+          <section className="card">
+            <h2>Allocation (stocks vs bonds)</h2>
             {total > 0 ? (
               <>
                 <div
@@ -170,14 +153,14 @@ export default function DashboardPage() {
                     height: 28,
                     borderRadius: 6,
                     overflow: 'hidden',
-                    background: '#eee',
-                    marginBottom: '0.5rem',
+                    background: 'var(--bg-elevated)',
+                    marginBottom: '0.75rem',
                   }}
                 >
                   <div
                     style={{
                       width: `${stocksPct}%`,
-                      background: '#2563eb',
+                      background: 'var(--accent)',
                       transition: 'width 0.2s',
                     }}
                     title={`Stocks ${stocksPct.toFixed(1)}%`}
@@ -185,71 +168,51 @@ export default function DashboardPage() {
                   <div
                     style={{
                       width: `${bondsPct}%`,
-                      background: '#059669',
+                      background: 'var(--success)',
                       transition: 'width 0.2s',
                     }}
                     title={`Bonds ${bondsPct.toFixed(1)}%`}
                   />
                 </div>
-                <div style={{ display: 'flex', gap: '1.5rem', fontSize: '0.9rem' }}>
-                  <span style={{ color: '#2563eb' }}>■ Stocks {stocksPct.toFixed(1)}%</span>
-                  <span style={{ color: '#059669' }}>■ Bonds {bondsPct.toFixed(1)}%</span>
+                <div className="flex gap-2 muted" style={{ fontSize: '0.9rem' }}>
+                  <span style={{ color: 'var(--accent)' }}>■ Stocks {stocksPct.toFixed(1)}%</span>
+                  <span style={{ color: 'var(--success)' }}>■ Bonds {bondsPct.toFixed(1)}%</span>
                 </div>
               </>
             ) : (
-              <p style={{ color: '#666' }}>No positions. Add trades and bonds.</p>
+              <p className="muted">No positions. Add trades and bonds.</p>
             )}
           </section>
 
-          <section>
-            <h2 style={{ marginBottom: '0.75rem', fontSize: '1.1rem' }}>
-              Top positions
-            </h2>
+          <section className="card">
+            <h2>Top positions</h2>
             {topPositions.length === 0 ? (
-              <p style={{ color: '#666' }}>No positions yet.</p>
+              <p className="muted">No positions yet.</p>
             ) : (
-              <table
-                style={{
-                  width: '100%',
-                  maxWidth: 400,
-                  borderCollapse: 'collapse',
-                  background: '#fafafa',
-                  borderRadius: 8,
-                  overflow: 'hidden',
-                }}
-              >
-                <thead>
-                  <tr style={{ background: '#eee', textAlign: 'left' }}>
-                    <th style={thStyle}>Name</th>
-                    <th style={thStyle}>Type</th>
-                    <th style={thStyle}>Value</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {topPositions.map((p, i) => (
-                    <tr
-                      key={`${p.type}-${p.name}-${i}`}
-                      style={{ borderBottom: '1px solid #eee' }}
-                    >
-                      <td style={tdStyle}>{p.name}</td>
-                      <td style={tdStyle}>{p.type}</td>
-                      <td style={tdStyle}>{p.value.toFixed(2)}</td>
+              <div className="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Type</th>
+                      <th>Value</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {topPositions.map((p, i) => (
+                      <tr key={`${p.type}-${p.name}-${i}`}>
+                        <td>{p.name}</td>
+                        <td>{p.type}</td>
+                        <td>{p.value.toFixed(2)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             )}
           </section>
         </>
       )}
-    </main>
+    </>
   );
 }
-
-const thStyle: React.CSSProperties = {
-  padding: '0.6rem 0.75rem',
-  fontWeight: 600,
-};
-const tdStyle: React.CSSProperties = {
-  padding: '0.5rem 0.75rem',
-};

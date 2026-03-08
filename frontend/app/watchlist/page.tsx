@@ -43,7 +43,6 @@ export default function WatchlistPage() {
     loadWatchlist();
   }, [loadWatchlist]);
 
-  // Fetch current price for each ticker and build signal
   useEffect(() => {
     if (items.length === 0) {
       setRows([]);
@@ -105,109 +104,72 @@ export default function WatchlistPage() {
   }
 
   return (
-    <main style={{ padding: '2rem', maxWidth: 700 }}>
-      <h1 style={{ marginBottom: '1.5rem' }}>Watchlist</h1>
+    <>
+      <h1 style={{ marginBottom: '1.5rem', fontSize: '1.75rem', fontWeight: 700 }}>
+        Watchlist
+      </h1>
 
-      <section style={{ marginBottom: '2rem' }}>
-        <h2 style={{ marginBottom: '0.75rem', fontSize: '1.1rem' }}>
-          Add ticker
-        </h2>
-        <form
-          onSubmit={handleAdd}
-          style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}
-        >
+      <section className="card">
+        <h2>Add ticker</h2>
+        <form onSubmit={handleAdd} className="flex items-center gap-1">
           <input
             type="text"
+            className="input"
             value={formTicker}
             onChange={(e) => setFormTicker(e.target.value)}
             placeholder="e.g. AAPL.US"
-            style={{ padding: '0.5rem 0.75rem', width: 160 }}
+            style={{ width: 180 }}
           />
-          <button
-            type="submit"
-            disabled={submitting}
-            style={{
-              padding: '0.5rem 1rem',
-              cursor: submitting ? 'not-allowed' : 'pointer',
-            }}
-          >
+          <button type="submit" className="btn btn-primary" disabled={submitting}>
             {submitting ? 'Adding…' : 'Add'}
           </button>
         </form>
       </section>
 
-      <section>
-        <h2 style={{ marginBottom: '0.75rem', fontSize: '1.1rem' }}>
-          Tickers
-        </h2>
+      <section className="card">
+        <h2>Tickers</h2>
         {loading ? (
-          <p style={{ color: '#666' }}>Loading…</p>
+          <p className="muted">Loading…</p>
         ) : items.length === 0 ? (
-          <p style={{ color: '#666' }}>No tickers in watchlist. Add one above.</p>
+          <p className="muted">No tickers in watchlist. Add one above.</p>
         ) : (
-          <table
-            style={{
-              width: '100%',
-              borderCollapse: 'collapse',
-              background: '#fafafa',
-              borderRadius: 8,
-              overflow: 'hidden',
-            }}
-          >
-            <thead>
-              <tr style={{ background: '#eee', textAlign: 'left' }}>
-                <th style={thStyle}>Ticker</th>
-                <th style={thStyle}>Price</th>
-                <th style={thStyle}>Signal</th>
-                <th style={thStyle}></th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((r) => (
-                <tr key={r.id} style={{ borderBottom: '1px solid #eee' }}>
-                  <td style={tdStyle}>{r.ticker}</td>
-                  <td style={tdStyle}>
-                    {r.price != null ? r.price.toFixed(2) : '—'}
-                  </td>
-                  <td style={tdStyle}>
-                    <span
-                      style={{
-                        color: r.signal === 'ok' ? '#0a0' : '#c00',
-                        fontWeight: 500,
-                      }}
-                    >
-                      {r.signal === 'ok' ? 'ok' : 'price unavailable'}
-                    </span>
-                  </td>
-                  <td style={tdStyle}>
-                    <button
-                      type="button"
-                      onClick={() => handleDelete(r.id)}
-                      disabled={deletingId === r.id}
-                      style={{
-                        padding: '0.25rem 0.5rem',
-                        fontSize: '0.85rem',
-                        cursor: deletingId === r.id ? 'not-allowed' : 'pointer',
-                        color: '#c00',
-                      }}
-                    >
-                      {deletingId === r.id ? '…' : 'Delete'}
-                    </button>
-                  </td>
+          <div className="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Ticker</th>
+                  <th>Price</th>
+                  <th>Signal</th>
+                  <th></th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {rows.map((r) => (
+                  <tr key={r.id}>
+                    <td>{r.ticker}</td>
+                    <td>{r.price != null ? r.price.toFixed(2) : '—'}</td>
+                    <td>
+                      <span className={r.signal === 'ok' ? 'text-success' : 'text-danger'}>
+                        {r.signal === 'ok' ? 'ok' : 'price unavailable'}
+                      </span>
+                    </td>
+                    <td>
+                      <button
+                        type="button"
+                        className="btn btn-danger"
+                        onClick={() => handleDelete(r.id)}
+                        disabled={deletingId === r.id}
+                      >
+                        {deletingId === r.id ? '…' : 'Delete'}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </section>
-    </main>
+    </>
   );
 }
-
-const thStyle: React.CSSProperties = {
-  padding: '0.6rem 0.75rem',
-  fontWeight: 600,
-};
-const tdStyle: React.CSSProperties = {
-  padding: '0.5rem 0.75rem',
-};

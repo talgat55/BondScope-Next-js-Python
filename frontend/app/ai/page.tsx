@@ -127,83 +127,57 @@ export default function AIPage() {
   }
 
   return (
-    <main style={{ padding: '2rem', maxWidth: 800 }}>
-      <h1 style={{ marginBottom: '1rem' }}>AI</h1>
-      <div style={{ marginBottom: '1.5rem', display: 'flex', gap: '0.5rem' }}>
+    <>
+      <h1 style={{ marginBottom: '1rem', fontSize: '1.75rem', fontWeight: 700 }}>
+        AI
+      </h1>
+      <div className="flex gap-1" style={{ marginBottom: '1.5rem' }}>
         <button
           type="button"
+          className={tab === 'report' ? 'btn btn-primary' : 'btn btn-ghost'}
           onClick={() => setTab('report')}
-          style={{
-            padding: '0.5rem 1rem',
-            cursor: 'pointer',
-            fontWeight: tab === 'report' ? 600 : 400,
-            background: tab === 'report' ? '#eee' : 'transparent',
-            border: '1px solid #ccc',
-            borderRadius: 6,
-          }}
         >
           AI Report
         </button>
         <button
           type="button"
+          className={tab === 'chat' ? 'btn btn-primary' : 'btn btn-ghost'}
           onClick={() => setTab('chat')}
-          style={{
-            padding: '0.5rem 1rem',
-            cursor: 'pointer',
-            fontWeight: tab === 'chat' ? 600 : 400,
-            background: tab === 'chat' ? '#eee' : 'transparent',
-            border: '1px solid #ccc',
-            borderRadius: 6,
-          }}
         >
           AI Chat
         </button>
       </div>
 
-      <p style={{ marginBottom: '1rem', fontSize: '0.9rem', color: '#666' }}>
+      <p className="muted" style={{ marginBottom: '1rem', fontSize: '0.9rem' }}>
         {DISCLAIMER_TEXT}
       </p>
 
       {tab === 'report' && (
-        <section>
-          <h2 style={{ marginBottom: '0.75rem', fontSize: '1.1rem' }}>
-            Portfolio report
-          </h2>
+        <section className="card">
+          <h2>Portfolio report</h2>
           <button
             type="button"
+            className="btn btn-primary"
             onClick={handleGenerateReport}
             disabled={reportLoading}
-            style={{
-              padding: '0.5rem 1rem',
-              marginBottom: '1rem',
-              cursor: reportLoading ? 'not-allowed' : 'pointer',
-            }}
+            style={{ marginBottom: '1rem' }}
           >
             {reportLoading ? 'Generating…' : 'Generate'}
           </button>
           {reportError && (
-            <p style={{ color: '#c00', marginBottom: '0.5rem' }}>
+            <p className="text-danger" style={{ marginBottom: '0.5rem' }}>
               {reportError}
             </p>
           )}
           {report && (
-            <div
-              style={{
-                padding: '1rem',
-                background: '#fafafa',
-                borderRadius: 8,
-                border: '1px solid #eee',
-              }}
-            >
-              <div
-                style={{ marginBottom: '1rem', lineHeight: 1.6 }}
-              >
+            <div className="card" style={{ marginTop: '1rem' }}>
+              <div style={{ marginBottom: '1rem', lineHeight: 1.6 }}>
                 <ReactMarkdown>{report.summary_md}</ReactMarkdown>
               </div>
               {report.bullets.length > 0 && (
                 <>
-                  <h3 style={{ fontSize: '1rem', marginBottom: 0.5 }}>Bullets</h3>
-                  <ul style={{ marginBottom: '1rem', paddingLeft: '1.25rem' }}>
+                  <h3 style={{ marginBottom: 0.5 }}>Bullets</h3>
+                  <ul style={{ marginBottom: '1rem' }}>
                     {report.bullets.map((b, i) => (
                       <li key={i}>{b}</li>
                     ))}
@@ -212,8 +186,8 @@ export default function AIPage() {
               )}
               {report.risks.length > 0 && (
                 <>
-                  <h3 style={{ fontSize: '1rem', marginBottom: 0.5 }}>Risks</h3>
-                  <ul style={{ marginBottom: '1rem', paddingLeft: '1.25rem' }}>
+                  <h3 style={{ marginBottom: 0.5 }}>Risks</h3>
+                  <ul style={{ marginBottom: '1rem' }}>
                     {report.risks.map((r, i) => (
                       <li key={i}>{r}</li>
                     ))}
@@ -222,17 +196,15 @@ export default function AIPage() {
               )}
               {report.questions_to_check.length > 0 && (
                 <>
-                  <h3 style={{ fontSize: '1rem', marginBottom: 0.5 }}>
-                    Questions to check
-                  </h3>
-                  <ul style={{ marginBottom: '1rem', paddingLeft: '1.25rem' }}>
+                  <h3 style={{ marginBottom: 0.5 }}>Questions to check</h3>
+                  <ul style={{ marginBottom: '1rem' }}>
                     {report.questions_to_check.map((q, i) => (
                       <li key={i}>{q}</li>
                     ))}
                   </ul>
                 </>
               )}
-              <p style={{ fontSize: '0.85rem', color: '#666', marginTop: '0.5rem' }}>
+              <p className="muted" style={{ fontSize: '0.85rem', marginTop: '0.5rem' }}>
                 {report.disclaimer}
               </p>
             </div>
@@ -241,26 +213,26 @@ export default function AIPage() {
       )}
 
       {tab === 'chat' && (
-        <section>
-          <h2 style={{ marginBottom: '0.75rem', fontSize: '1.1rem' }}>
-            Ask about your data
-          </h2>
+        <section className="card">
+          <h2>Ask about your data</h2>
           {chatError && (
-            <p style={{ color: '#c00', marginBottom: '0.5rem' }}>{chatError}</p>
+            <p className="text-danger" style={{ marginBottom: '0.5rem' }}>
+              {chatError}
+            </p>
           )}
           <div
             style={{
               marginBottom: '1rem',
               maxHeight: 400,
               overflow: 'auto',
-              padding: '0.75rem',
-              background: '#f9f9f9',
-              borderRadius: 8,
-              border: '1px solid #eee',
+              padding: '1rem',
+              background: 'var(--bg-elevated)',
+              borderRadius: 'var(--radius-sm)',
+              border: '1px solid var(--border)',
             }}
           >
             {chatMessages.length === 0 && (
-              <p style={{ color: '#666', fontSize: '0.9rem' }}>
+              <p className="muted" style={{ fontSize: '0.9rem' }}>
                 Ask a question about your portfolio, bonds, or watchlist.
               </p>
             )}
@@ -276,7 +248,7 @@ export default function AIPage() {
                   style={{
                     fontWeight: 600,
                     fontSize: '0.85rem',
-                    color: m.role === 'user' ? '#2563eb' : '#059669',
+                    color: m.role === 'user' ? 'var(--accent)' : 'var(--success)',
                   }}
                 >
                   {m.role === 'user' ? 'You' : 'AI'}
@@ -284,9 +256,9 @@ export default function AIPage() {
                 <div
                   style={{
                     marginTop: 2,
-                    padding: '0.5rem',
-                    background: m.role === 'user' ? '#e8f4ff' : '#f0fdf4',
-                    borderRadius: 6,
+                    padding: '0.5rem 0.75rem',
+                    background: m.role === 'user' ? 'rgba(56, 189, 248, 0.15)' : 'rgba(52, 211, 153, 0.12)',
+                    borderRadius: 'var(--radius-sm)',
                     display: 'inline-block',
                     maxWidth: '100%',
                     textAlign: 'left',
@@ -299,22 +271,16 @@ export default function AIPage() {
                   )}
                 </div>
                 {m.disclaimer && (
-                  <p
-                    style={{
-                      fontSize: '0.8rem',
-                      color: '#666',
-                      marginTop: 4,
-                      marginBottom: 0,
-                    }}
-                  >
+                  <p className="muted" style={{ fontSize: '0.8rem', marginTop: 4, marginBottom: 0 }}>
                     {m.disclaimer}
                   </p>
                 )}
               </div>
             ))}
           </div>
-          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-end' }}>
+          <div className="flex gap-1" style={{ alignItems: 'flex-end' }}>
             <textarea
+              className="input"
               value={chatInput}
               onChange={(e) => setChatInput(e.target.value)}
               onKeyDown={(e) => {
@@ -325,27 +291,19 @@ export default function AIPage() {
               }}
               placeholder="Your question..."
               rows={2}
-              style={{
-                flex: 1,
-                padding: '0.5rem 0.75rem',
-                resize: 'vertical',
-              }}
+              style={{ flex: 1, resize: 'vertical' }}
             />
             <button
               type="button"
+              className="btn btn-primary"
               onClick={handleSendChat}
               disabled={chatLoading || !chatInput.trim()}
-              style={{
-                padding: '0.5rem 1rem',
-                cursor:
-                  chatLoading || !chatInput.trim() ? 'not-allowed' : 'pointer',
-              }}
             >
               {chatLoading ? 'Sending…' : 'Send'}
             </button>
           </div>
         </section>
       )}
-    </main>
+    </>
   );
 }

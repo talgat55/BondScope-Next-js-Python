@@ -53,7 +53,6 @@ export default function PortfolioPage() {
     loadTrades();
   }, [loadTrades]);
 
-  // Aggregate positions and fetch current prices
   useEffect(() => {
     if (trades.length === 0) {
       setPositions([]);
@@ -150,196 +149,145 @@ export default function PortfolioPage() {
   }
 
   return (
-    <main style={{ padding: '2rem', maxWidth: 900 }}>
-      <h1 style={{ marginBottom: '1.5rem' }}>Portfolio</h1>
+    <>
+      <h1 style={{ marginBottom: '1.5rem', fontSize: '1.75rem', fontWeight: 700 }}>
+        Portfolio
+      </h1>
 
-      <section style={{ marginBottom: '2rem' }}>
-        <h2 style={{ marginBottom: '0.75rem', fontSize: '1.1rem' }}>
-          Add trade
-        </h2>
+      <section className="card">
+        <h2>Add trade</h2>
         <form
           onSubmit={handleSubmit}
-          style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: '0.75rem',
-            alignItems: 'flex-end',
-          }}
+          className="flex flex-wrap items-center gap-2"
+          style={{ alignItems: 'flex-end' }}
         >
-          <label style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <label style={{ width: 120 }}>
             Ticker
             <input
               type="text"
+              className="input"
               value={form.ticker}
               onChange={(e) => setForm((f) => ({ ...f, ticker: e.target.value }))}
-              placeholder="e.g. AAPL.US"
-              style={{ padding: '0.4rem 0.6rem', width: 120 }}
+              placeholder="AAPL.US"
             />
           </label>
-          <label style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <label style={{ width: 90 }}>
             Qty
             <input
               type="number"
+              className="input"
               min="0.0001"
               step="any"
               value={form.quantity}
               onChange={(e) => setForm((f) => ({ ...f, quantity: e.target.value }))}
-              style={{ padding: '0.4rem 0.6rem', width: 90 }}
             />
           </label>
-          <label style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <label style={{ width: 90 }}>
             Buy price
             <input
               type="number"
+              className="input"
               min="0.0001"
               step="any"
               value={form.buy_price}
-              onChange={(e) =>
-                setForm((f) => ({ ...f, buy_price: e.target.value }))
-              }
-              style={{ padding: '0.4rem 0.6rem', width: 90 }}
+              onChange={(e) => setForm((f) => ({ ...f, buy_price: e.target.value }))}
             />
           </label>
-          <label style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <label style={{ width: 140 }}>
             Buy date
             <input
               type="date"
+              className="input"
               value={form.buy_date}
               onChange={(e) => setForm((f) => ({ ...f, buy_date: e.target.value }))}
-              style={{ padding: '0.4rem 0.6rem', width: 140 }}
             />
           </label>
-          <button
-            type="submit"
-            disabled={submitting}
-            style={{
-              padding: '0.5rem 1rem',
-              cursor: submitting ? 'not-allowed' : 'pointer',
-            }}
-          >
+          <button type="submit" className="btn btn-primary" disabled={submitting}>
             {submitting ? 'Adding…' : 'Add'}
           </button>
         </form>
       </section>
 
       {positions.length > 0 && (
-        <section style={{ marginBottom: '2rem' }}>
-          <h2 style={{ marginBottom: '0.75rem', fontSize: '1.1rem' }}>
-            Positions (by ticker)
-          </h2>
-          <table
-            style={{
-              width: '100%',
-              borderCollapse: 'collapse',
-              background: '#fafafa',
-              borderRadius: 8,
-              overflow: 'hidden',
-            }}
-          >
-            <thead>
-              <tr style={{ background: '#eee', textAlign: 'left' }}>
-                <th style={thStyle}>Ticker</th>
-                <th style={thStyle}>Qty</th>
-                <th style={thStyle}>Avg cost</th>
-                <th style={thStyle}>Current price</th>
-                <th style={thStyle}>P&amp;L</th>
-              </tr>
-            </thead>
-            <tbody>
-              {positions.map((p) => (
-                <tr key={p.ticker} style={{ borderBottom: '1px solid #eee' }}>
-                  <td style={tdStyle}>{p.ticker}</td>
-                  <td style={tdStyle}>{p.totalQty}</td>
-                  <td style={tdStyle}>{p.avgCost.toFixed(2)}</td>
-                  <td style={tdStyle}>
-                    {p.currentPrice != null
-                      ? p.currentPrice.toFixed(2)
-                      : '—'}
-                  </td>
-                  <td style={tdStyle}>
-                    {p.pnl != null ? (
-                      <span
-                        style={{
-                          color: p.pnl >= 0 ? '#0a0' : '#c00',
-                        }}
-                      >
-                        {p.pnl >= 0 ? '+' : ''}
-                        {p.pnl.toFixed(2)}
-                      </span>
-                    ) : (
-                      '—'
-                    )}
-                  </td>
+        <section className="card">
+          <h2>Positions (by ticker)</h2>
+          <div className="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Ticker</th>
+                  <th>Qty</th>
+                  <th>Avg cost</th>
+                  <th>Current price</th>
+                  <th>P&amp;L</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {positions.map((p) => (
+                  <tr key={p.ticker}>
+                    <td>{p.ticker}</td>
+                    <td>{p.totalQty}</td>
+                    <td>{p.avgCost.toFixed(2)}</td>
+                    <td>{p.currentPrice != null ? p.currentPrice.toFixed(2) : '—'}</td>
+                    <td>
+                      {p.pnl != null ? (
+                        <span className={p.pnl >= 0 ? 'text-success' : 'text-danger'}>
+                          {p.pnl >= 0 ? '+' : ''}{p.pnl.toFixed(2)}
+                        </span>
+                      ) : (
+                        '—'
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </section>
       )}
 
-      <section>
-        <h2 style={{ marginBottom: '0.75rem', fontSize: '1.1rem' }}>
-          Trades
-        </h2>
+      <section className="card">
+        <h2>Trades</h2>
         {loading ? (
-          <p style={{ color: '#666' }}>Loading…</p>
+          <p className="muted">Loading…</p>
         ) : trades.length === 0 ? (
-          <p style={{ color: '#666' }}>No trades yet. Add one above.</p>
+          <p className="muted">No trades yet. Add one above.</p>
         ) : (
-          <table
-            style={{
-              width: '100%',
-              borderCollapse: 'collapse',
-              background: '#fafafa',
-              borderRadius: 8,
-              overflow: 'hidden',
-            }}
-          >
-            <thead>
-              <tr style={{ background: '#eee', textAlign: 'left' }}>
-                <th style={thStyle}>Ticker</th>
-                <th style={thStyle}>Qty</th>
-                <th style={thStyle}>Buy price</th>
-                <th style={thStyle}>Buy date</th>
-                <th style={thStyle}></th>
-              </tr>
-            </thead>
-            <tbody>
-              {trades.map((t) => (
-                <tr key={t.id} style={{ borderBottom: '1px solid #eee' }}>
-                  <td style={tdStyle}>{t.ticker}</td>
-                  <td style={tdStyle}>{t.quantity}</td>
-                  <td style={tdStyle}>{t.buy_price.toFixed(2)}</td>
-                  <td style={tdStyle}>{t.buy_date}</td>
-                  <td style={tdStyle}>
-                    <button
-                      type="button"
-                      onClick={() => handleDelete(t.id)}
-                      disabled={deletingId === t.id}
-                      style={{
-                        padding: '0.25rem 0.5rem',
-                        fontSize: '0.85rem',
-                        cursor: deletingId === t.id ? 'not-allowed' : 'pointer',
-                        color: '#c00',
-                      }}
-                    >
-                      {deletingId === t.id ? '…' : 'Delete'}
-                    </button>
-                  </td>
+          <div className="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Ticker</th>
+                  <th>Qty</th>
+                  <th>Buy price</th>
+                  <th>Buy date</th>
+                  <th></th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {trades.map((t) => (
+                  <tr key={t.id}>
+                    <td>{t.ticker}</td>
+                    <td>{t.quantity}</td>
+                    <td>{t.buy_price.toFixed(2)}</td>
+                    <td>{t.buy_date}</td>
+                    <td>
+                      <button
+                        type="button"
+                        className="btn btn-danger"
+                        onClick={() => handleDelete(t.id)}
+                        disabled={deletingId === t.id}
+                      >
+                        {deletingId === t.id ? '…' : 'Delete'}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </section>
-    </main>
+    </>
   );
 }
-
-const thStyle: React.CSSProperties = {
-  padding: '0.6rem 0.75rem',
-  fontWeight: 600,
-};
-const tdStyle: React.CSSProperties = {
-  padding: '0.5rem 0.75rem',
-};

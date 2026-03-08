@@ -10,20 +10,13 @@ export default function NotFound() {
         textAlign: 'center',
       }}
     >
-      <h1 style={{ marginBottom: '0.5rem' }}>404</h1>
-      <p style={{ color: '#666', marginBottom: '1.5rem' }}>
+      <h1 style={{ marginBottom: '0.5rem', fontSize: '2.5rem', fontWeight: 700 }}>
+        404
+      </h1>
+      <p className="muted" style={{ marginBottom: '1.5rem' }}>
         Page not found.
       </p>
-      <Link
-        href="/"
-        style={{
-          padding: '0.5rem 1rem',
-          background: '#2563eb',
-          color: '#fff',
-          borderRadius: 6,
-          textDecoration: 'none',
-        }}
-      >
+      <Link href="/" className="btn btn-primary">
         Back to Dashboard
       </Link>
     </main>

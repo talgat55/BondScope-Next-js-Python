@@ -119,240 +119,171 @@ export default function BondsPage() {
   const selectedBond = selectedId != null ? bonds.find((b) => b.id === selectedId) : null;
 
   return (
-    <main style={{ padding: '2rem', maxWidth: 900 }}>
-      <h1 style={{ marginBottom: '1.5rem' }}>Bonds</h1>
+    <>
+      <h1 style={{ marginBottom: '1.5rem', fontSize: '1.75rem', fontWeight: 700 }}>
+        Bonds
+      </h1>
 
-      <section style={{ marginBottom: '2rem' }}>
-        <h2 style={{ marginBottom: '0.75rem', fontSize: '1.1rem' }}>
-          Add bond
-        </h2>
+      <section className="card">
+        <h2>Add bond</h2>
         <form
           onSubmit={handleSubmit}
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))',
-            gap: '0.75rem',
-            alignItems: 'flex-end',
-            maxWidth: 700,
-          }}
+          className="flex flex-wrap items-center gap-2"
+          style={{ alignItems: 'flex-end', maxWidth: 720 }}
         >
-          <label style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <label style={{ minWidth: 140 }}>
             Name
             <input
               type="text"
+              className="input"
               value={form.name}
               onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
               placeholder="Bond name"
-              style={{ padding: '0.4rem 0.6rem' }}
             />
           </label>
-          <label style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <label style={{ width: 90 }}>
             Face
             <input
               type="number"
+              className="input"
               min="0.01"
               step="any"
               value={form.face}
               onChange={(e) => setForm((f) => ({ ...f, face: e.target.value }))}
-              style={{ padding: '0.4rem 0.6rem' }}
             />
           </label>
-          <label style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-            Coupon % (e.g. 5)
+          <label style={{ width: 100 }}>
+            Coupon %
             <input
               type="number"
+              className="input"
               min="0"
               step="0.01"
               value={form.coupon_rate}
               onChange={(e) =>
                 setForm((f) => ({ ...f, coupon_rate: e.target.value }))
               }
-              style={{ padding: '0.4rem 0.6rem' }}
             />
           </label>
-          <label style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-            Freq (1/2/4/12)
+          <label style={{ width: 80 }}>
+            Freq
             <input
               type="number"
+              className="input"
               min="1"
               max="12"
               value={form.coupon_freq}
               onChange={(e) =>
                 setForm((f) => ({ ...f, coupon_freq: e.target.value }))
               }
-              style={{ padding: '0.4rem 0.6rem' }}
             />
           </label>
-          <label style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <label style={{ width: 80 }}>
             Price
             <input
               type="number"
+              className="input"
               min="0.01"
               step="any"
               value={form.price}
               onChange={(e) => setForm((f) => ({ ...f, price: e.target.value }))}
-              style={{ padding: '0.4rem 0.6rem' }}
             />
           </label>
-          <label style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-            Maturity date
+          <label style={{ width: 140 }}>
+            Maturity
             <input
               type="date"
+              className="input"
               value={form.maturity_date}
               onChange={(e) =>
                 setForm((f) => ({ ...f, maturity_date: e.target.value }))
               }
-              style={{ padding: '0.4rem 0.6rem' }}
             />
           </label>
-          <button
-            type="submit"
-            disabled={submitting}
-            style={{
-              padding: '0.5rem 1rem',
-              cursor: submitting ? 'not-allowed' : 'pointer',
-            }}
-          >
+          <button type="submit" className="btn btn-primary" disabled={submitting}>
             {submitting ? 'Adding…' : 'Add'}
           </button>
         </form>
       </section>
 
-      <section style={{ marginBottom: '2rem' }}>
-        <h2 style={{ marginBottom: '0.75rem', fontSize: '1.1rem' }}>
-          Bonds
-        </h2>
+      <section className="card">
+        <h2>Bonds</h2>
         {loading ? (
-          <p style={{ color: '#666' }}>Loading…</p>
+          <p className="muted">Loading…</p>
         ) : bonds.length === 0 ? (
-          <p style={{ color: '#666' }}>No bonds yet. Add one above.</p>
+          <p className="muted">No bonds yet. Add one above.</p>
         ) : (
-          <table
-            style={{
-              width: '100%',
-              borderCollapse: 'collapse',
-              background: '#fafafa',
-              borderRadius: 8,
-              overflow: 'hidden',
-            }}
-          >
-            <thead>
-              <tr style={{ background: '#eee', textAlign: 'left' }}>
-                <th style={thStyle}>Name</th>
-                <th style={thStyle}>Face</th>
-                <th style={thStyle}>Coupon %</th>
-                <th style={thStyle}>Freq</th>
-                <th style={thStyle}>Price</th>
-                <th style={thStyle}>Maturity</th>
-              </tr>
-            </thead>
-            <tbody>
-              {bonds.map((b) => (
-                <tr
-                  key={b.id}
-                  onClick={() => setSelectedId(b.id)}
-                  style={{
-                    borderBottom: '1px solid #eee',
-                    cursor: 'pointer',
-                    background: selectedId === b.id ? '#e8f4ff' : undefined,
-                  }}
-                >
-                  <td style={tdStyle}>{b.name}</td>
-                  <td style={tdStyle}>{b.face}</td>
-                  <td style={tdStyle}>{(b.coupon_rate * 100).toFixed(2)}</td>
-                  <td style={tdStyle}>{b.coupon_freq}</td>
-                  <td style={tdStyle}>{b.price.toFixed(2)}</td>
-                  <td style={tdStyle}>{b.maturity_date}</td>
+          <div className="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Face</th>
+                  <th>Coupon %</th>
+                  <th>Freq</th>
+                  <th>Price</th>
+                  <th>Maturity</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {bonds.map((b) => (
+                  <tr
+                    key={b.id}
+                    onClick={() => setSelectedId(b.id)}
+                    className={selectedId === b.id ? 'selected' : ''}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <td>{b.name}</td>
+                    <td>{b.face}</td>
+                    <td>{(b.coupon_rate * 100).toFixed(2)}</td>
+                    <td>{b.coupon_freq}</td>
+                    <td>{b.price.toFixed(2)}</td>
+                    <td>{b.maturity_date}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </section>
 
       {selectedBond && (
-        <section
-          style={{
-            marginTop: '2rem',
-            padding: '1rem',
-            background: '#f8f9fa',
-            borderRadius: 8,
-            border: '1px solid #dee2e6',
-          }}
-        >
-          <h2 style={{ marginBottom: '0.75rem', fontSize: '1.1rem' }}>
-            Metrics: {selectedBond.name}
-          </h2>
+        <section className="card">
+          <h2>Metrics: {selectedBond.name}</h2>
           {metricsLoading ? (
-            <p style={{ color: '#666' }}>Loading metrics…</p>
+            <p className="muted">Loading metrics…</p>
           ) : metrics ? (
             <>
-              <div
-                style={{
-                  display: 'flex',
-                  flexWrap: 'wrap',
-                  gap: '1.5rem',
-                  marginBottom: '1rem',
-                }}
-              >
-                <div>
-                  <strong>YTM:</strong>{' '}
-                  {(metrics.ytm * 100).toFixed(2)}%
-                </div>
-                <div>
-                  <strong>Current yield:</strong>{' '}
-                  {(metrics.current_yield * 100).toFixed(2)}%
-                </div>
-                <div>
-                  <strong>Duration:</strong>{' '}
-                  {metrics.duration.toFixed(4)} yrs
-                </div>
+              <div className="flex flex-wrap gap-2" style={{ marginBottom: '1rem' }}>
+                <span><strong>YTM:</strong> {(metrics.ytm * 100).toFixed(2)}%</span>
+                <span><strong>Current yield:</strong> {(metrics.current_yield * 100).toFixed(2)}%</span>
+                <span><strong>Duration:</strong> {metrics.duration.toFixed(4)} yrs</span>
               </div>
-              <h3 style={{ marginBottom: '0.5rem', fontSize: '1rem' }}>
-                Cashflows
-              </h3>
-              <table
-                style={{
-                  width: '100%',
-                  maxWidth: 400,
-                  borderCollapse: 'collapse',
-                  background: '#fff',
-                  borderRadius: 6,
-                  overflow: 'hidden',
-                }}
-              >
-                <thead>
-                  <tr style={{ background: '#eee', textAlign: 'left' }}>
-                    <th style={thStyle}>Date</th>
-                    <th style={thStyle}>Amount</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {metrics.cashflows.map((cf, i) => (
-                    <tr
-                      key={i}
-                      style={{ borderBottom: '1px solid #eee' }}
-                    >
-                      <td style={tdStyle}>{cf.date}</td>
-                      <td style={tdStyle}>{cf.amount.toFixed(2)}</td>
+              <h3 style={{ marginBottom: '0.5rem' }}>Cashflows</h3>
+              <div className="table-wrap" style={{ maxWidth: 400 }}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Amount</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {metrics.cashflows.map((cf, i) => (
+                      <tr key={i}>
+                        <td>{cf.date}</td>
+                        <td>{cf.amount.toFixed(2)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </>
           ) : (
-            <p style={{ color: '#666' }}>Could not load metrics.</p>
+            <p className="muted">Could not load metrics.</p>
           )}
         </section>
       )}
-    </main>
+    </>
   );
 }
-
-const thStyle: React.CSSProperties = {
-  padding: '0.6rem 0.75rem',
-  fontWeight: 600,
-};
-const tdStyle: React.CSSProperties = {
-  padding: '0.5rem 0.75rem',
-};
