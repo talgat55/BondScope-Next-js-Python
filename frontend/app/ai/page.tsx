@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import ReactMarkdown from 'react-markdown';
 
 interface ReportResponse {
   summary_md: string;
@@ -195,13 +196,9 @@ export default function AIPage() {
               }}
             >
               <div
-                style={{
-                  whiteSpace: 'pre-wrap',
-                  marginBottom: '1rem',
-                  lineHeight: 1.5,
-                }}
+                style={{ marginBottom: '1rem', lineHeight: 1.6 }}
               >
-                {report.summary_md}
+                <ReactMarkdown>{report.summary_md}</ReactMarkdown>
               </div>
               {report.bullets.length > 0 && (
                 <>
@@ -286,16 +283,20 @@ export default function AIPage() {
                 </span>
                 <div
                   style={{
-                    whiteSpace: 'pre-wrap',
                     marginTop: 2,
                     padding: '0.5rem',
                     background: m.role === 'user' ? '#e8f4ff' : '#f0fdf4',
                     borderRadius: 6,
                     display: 'inline-block',
                     maxWidth: '100%',
+                    textAlign: 'left',
                   }}
                 >
-                  {m.text}
+                  {m.role === 'assistant' ? (
+                    <ReactMarkdown>{m.text}</ReactMarkdown>
+                  ) : (
+                    <span style={{ whiteSpace: 'pre-wrap' }}>{m.text}</span>
+                  )}
                 </div>
                 {m.disclaimer && (
                   <p

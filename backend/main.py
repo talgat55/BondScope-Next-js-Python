@@ -10,6 +10,7 @@ from pathlib import Path
 import httpx
 from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, HTTPException, Query
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
 import bonds_math
@@ -24,6 +25,14 @@ from schemas import BondCreate, BondResponse, TradeCreate, TradeResponse, WatchC
 # Load .env from backend/ so it works when uvicorn is run from project root too
 load_dotenv(Path(__file__).resolve().parent / ".env")
 app = FastAPI(title="BondScope API")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # --- AI rate limit: 20 req/min per process (shared across /ai/report and /ai/chat) ---
 _ai_request_times: list[float] = []
