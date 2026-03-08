@@ -5,6 +5,7 @@ import re
 import time
 from datetime import date
 from io import StringIO
+from pathlib import Path
 
 import httpx
 from dotenv import load_dotenv
@@ -20,7 +21,8 @@ from database import get_db, init_db
 import models
 from schemas import BondCreate, BondResponse, TradeCreate, TradeResponse, WatchCreate, WatchResponse
 
-load_dotenv()
+# Load .env from backend/ so it works when uvicorn is run from project root too
+load_dotenv(Path(__file__).resolve().parent / ".env")
 app = FastAPI(title="BondScope API")
 
 # --- AI rate limit: 20 req/min per process (shared across /ai/report and /ai/chat) ---

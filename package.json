@@ -10,7 +10,9 @@
     "install:frontend": "cd frontend && npm install",
     "install:backend": "cd backend && pip install -r requirements.txt",
     "lint": "npm run lint:frontend",
-    "lint:frontend": "cd frontend && npm run lint"
+    "lint:frontend": "cd frontend && npm run lint",
+    "test": "cd backend && python -m pytest tests/ -v",
+    "test:backend": "cd backend && python -m pytest tests/ -v"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"

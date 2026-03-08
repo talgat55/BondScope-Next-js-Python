@@ -122,6 +122,22 @@ From the frontend, open **Dashboard** → **AI Report** (or go to http://localho
 - **Rate limit:** in-memory limit of 20 requests per minute (shared across `/ai/report` and `/ai/chat`). Exceeding returns **429**.
 - **Mistral usage:** API calls consume your Mistral account quota and may incur cost. Check [Mistral pricing](https://mistral.ai/pricing/) and set usage limits in the Mistral console if needed.
 
+## Tests (backend)
+
+From the project root (with backend venv activated so `pytest` and deps are available):
+
+```bash
+npm run test
+```
+
+Or from the backend folder:
+
+```bash
+cd backend && python -m pytest tests/ -v
+```
+
+Tests use an in-memory SQLite DB and do not call the Mistral API (AI endpoints return 501 when `MISTRAL_API_KEY` is unset). They cover: health, trades/bonds/watchlist CRUD, prices (mocked), AI disabled; `bonds_math` (cashflows, YTM, duration); and `ai.facts.get_facts`.
+
 ## Lint / type check (optional)
 
 - **Frontend:** from root run `npm run lint` (runs `next lint` in `frontend/`). TypeScript types are checked on build (`npm run build` in `frontend/`).
