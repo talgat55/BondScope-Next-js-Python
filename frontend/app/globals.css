@@ -95,6 +95,30 @@ a:hover {
   padding: 2rem 1.5rem;
 }
 
+.app-main--wide {
+  max-width: 1280px;
+}
+
+/* Wide bond market table: room for long RU headers + metrics */
+.table-wrap.market-bonds-table {
+  overflow-x: auto;
+}
+.table-wrap.market-bonds-table table {
+  width: 100%;
+  min-width: 1080px;
+  table-layout: auto;
+}
+.table-wrap.market-bonds-table th,
+.table-wrap.market-bonds-table td {
+  white-space: nowrap;
+  padding: 0.55rem 0.85rem;
+}
+.table-wrap.market-bonds-table th:first-child,
+.table-wrap.market-bonds-table td:first-child {
+  white-space: normal;
+  min-width: 8.5rem;
+}
+
 /* Cards & sections */
 .card {
   background: var(--bg-card);

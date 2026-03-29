@@ -1,10 +1,13 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useLocale } from '../i18n/LocaleContext';
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const { locale, setLocale, t } = useLocale();
+  const pathname = usePathname();
+  const wideMain = pathname?.startsWith('/market-bonds') ?? false;
 
   return (
     <>
@@ -15,6 +18,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         <Link href="/">{t.nav.dashboard}</Link>
         <Link href="/portfolio">{t.nav.portfolio}</Link>
         <Link href="/bonds">{t.nav.bonds}</Link>
+        <Link href="/market-bonds">{t.nav.marketBonds}</Link>
         <Link href="/watchlist">{t.nav.watchlist}</Link>
         <Link href="/ai">{t.nav.ai}</Link>
         <div className="lang-switcher">
@@ -36,7 +40,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           </button>
         </div>
       </nav>
-      <main className="app-main">{children}</main>
+      <main className={wideMain ? 'app-main app-main--wide' : 'app-main'}>{children}</main>
     </>
   );
 }

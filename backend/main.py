@@ -4,6 +4,7 @@ import os
 import re
 import time
 from datetime import date
+from typing import cast
 from io import StringIO
 from pathlib import Path
 
@@ -14,6 +15,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
 import bonds_math
+import market_bonds_data
 from ai import client as ai_client
 from ai import facts as ai_facts
 from ai import prompts as ai_prompts
@@ -216,6 +218,80 @@ def get_bond_metrics(bond_id: int, db: Session = Depends(get_db)):
         "duration": round(mod_dur, 6),
         "cashflows": cashflows_list,
     }
+
+
+# --- Market bonds (available on the market, for analysis) ---
+
+
+def _market_bond_metrics(face: float, coupon_rate: float, coupon_freq: int, maturity_date: date, price: float):
+    settlement = date.today()
+    if maturity_date <= settlement or price <= 0:
+        return None
+    try:
+        ytm = bonds_math.ytm_from_price_bisection(
+            price, face, coupon_rate, coupon_freq, maturity_date, settlement
+        )
+        cy = bonds_math.current_yield(face, coupon_rate, price)
+        mac = bonds_math.macaulay_duration(
+            face, coupon_rate, coupon_freq, maturity_date, settlement, ytm
+        )
+        mod_dur = bonds_math.modified_duration(mac, ytm)
+        return {"ytm": round(ytm, 6), "current_yield": round(cy, 6), "duration": round(mod_dur, 6)}
+    except Exception:
+        return None
+
+
+@app.get("/market-bonds")
+def get_market_bonds(
+    source: str = Query(
+        "intl",
+        description="Bond universe: 'rf' (Russia examples) or 'intl' (non-RU).",
+    ),
+):
+    """List bonds available on the market with optional price and computed metrics."""
+    if source not in ("rf", "intl"):
+        raise HTTPException(
+            status_code=422,
+            detail="Query parameter 'source' must be 'rf' or 'intl'.",
+        )
+    settlement = date.today()
+    result = []
+    bond_source = cast(market_bonds_data.MarketBondSource, source)
+    for i, row in enumerate(market_bonds_data.get_market_bonds_list(bond_source)):
+        maturity_date = date.fromisoformat(row["maturity_date"])
+        if maturity_date <= settlement:
+            continue
+        ticker = (row.get("ticker") or "").strip() or None
+        price: float | None = None
+        if ticker:
+            now = time.monotonic()
+            if ticker in _price_cache:
+                p, cached_at = _price_cache[ticker]
+                if now - cached_at < CACHE_TTL_SEC:
+                    price = p
+            if price is None:
+                price = _fetch_price_from_stooq(ticker)
+                if price is not None:
+                    _price_cache[ticker] = (price, now)
+        if price is None:
+            price = 100.0  # default for display/metrics when no ticker
+        metrics = _market_bond_metrics(
+            row["face"], row["coupon_rate"], row["coupon_freq"], maturity_date, price
+        )
+        result.append({
+            "id": i,
+            "name": row["name"],
+            "ticker": ticker,
+            "face": row["face"],
+            "coupon_rate": row["coupon_rate"],
+            "coupon_freq": row["coupon_freq"],
+            "maturity_date": row["maturity_date"],
+            "price": round(price, 2),
+            "ytm": metrics["ytm"] if metrics else None,
+            "current_yield": metrics["current_yield"] if metrics else None,
+            "duration": metrics["duration"] if metrics else None,
+        })
+    return result
 
 
 # --- Watchlist ---

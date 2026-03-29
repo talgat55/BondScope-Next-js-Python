@@ -143,3 +143,24 @@ def test_ai_chat_disabled(client: TestClient) -> None:
     r = client.post("/ai/chat", json={"message": "Hello"})
     assert r.status_code == 501
     assert "MISTRAL_API_KEY" in r.json()["detail"]
+
+
+def test_market_bonds_source_intl(client: TestClient) -> None:
+    r = client.get("/market-bonds?source=intl")
+    assert r.status_code == 200
+    names = {row["name"] for row in r.json()}
+    assert "US Treasury 2Y" in names
+    assert "OFZ 26234" not in names
+
+
+def test_market_bonds_source_rf(client: TestClient) -> None:
+    r = client.get("/market-bonds?source=rf")
+    assert r.status_code == 200
+    names = {row["name"] for row in r.json()}
+    assert "OFZ 26234" in names
+    assert "US Treasury 2Y" not in names
+
+
+def test_market_bonds_invalid_source(client: TestClient) -> None:
+    r = client.get("/market-bonds?source=xx")
+    assert r.status_code == 422

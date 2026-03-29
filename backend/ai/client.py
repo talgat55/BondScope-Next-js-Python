@@ -5,7 +5,7 @@ from concurrent.futures import TimeoutError as FuturesTimeoutError
 from concurrent.futures import ThreadPoolExecutor
 from typing import Any
 
-from mistralai import Mistral
+from mistralai.client import MistralClient
 
 DEFAULT_TIMEOUT_SEC = 60
 
@@ -34,11 +34,11 @@ def mistral_chat(
     """
     if not api_key or not api_key.strip():
         raise ValueError("Invalid MISTRAL_API_KEY")
-    client = Mistral(api_key=api_key.strip())
+    client = MistralClient(api_key=api_key.strip())
     try:
         with ThreadPoolExecutor(max_workers=1) as ex:
             future = ex.submit(
-                lambda: client.chat.complete(
+                lambda: client.chat(
                     model=model,
                     messages=messages,
                     temperature=temperature,

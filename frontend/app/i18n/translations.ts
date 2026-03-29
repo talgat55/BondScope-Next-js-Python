@@ -1,7 +1,7 @@
 export type Locale = 'ru' | 'en';
 
 export type TranslationKeys = {
-  nav: { dashboard: string; portfolio: string; bonds: string; watchlist: string; ai: string };
+  nav: { dashboard: string; portfolio: string; bonds: string; marketBonds: string; watchlist: string; ai: string };
   dashboard: {
     title: string;
     aiReport: string;
@@ -102,11 +102,20 @@ export type TranslationKeys = {
     errorInvalidKey: string;
     errorRequestFailed: string;
   };
+  marketBonds: {
+    title: string;
+    description: string;
+    sourceLabel: string;
+    sourceRf: string;
+    sourceIntl: string;
+    loading: string;
+    noData: string;
+  };
   notFound: { pageNotFound: string; backHome: string };
 };
 
 const ru: TranslationKeys = {
-  nav: { dashboard: 'Дашборд', portfolio: 'Портфель', bonds: 'Облигации', watchlist: 'Вотчлист', ai: 'ИИ' },
+  nav: { dashboard: 'Дашборд', portfolio: 'Портфель', bonds: 'Облигации', marketBonds: 'Рынок облигаций', watchlist: 'Вотчлист', ai: 'ИИ' },
   dashboard: {
     title: 'Дашборд',
     aiReport: 'Отчёт ИИ',
@@ -207,11 +216,20 @@ const ru: TranslationKeys = {
     errorInvalidKey: 'Неверный MISTRAL_API_KEY',
     errorRequestFailed: 'Ошибка запроса',
   },
+  marketBonds: {
+    title: 'Рынок облигаций',
+    description: 'Облигации, доступные на рынке — для анализа и сравнения доходности и дюрации.',
+    sourceLabel: 'Источник данных',
+    sourceRf: 'Россия (РФ)',
+    sourceIntl: 'Зарубеж',
+    loading: 'Загрузка…',
+    noData: 'Нет данных.',
+  },
   notFound: { pageNotFound: 'Страница не найдена.', backHome: 'На главную' },
 };
 
 const en: TranslationKeys = {
-  nav: { dashboard: 'Dashboard', portfolio: 'Portfolio', bonds: 'Bonds', watchlist: 'Watchlist', ai: 'AI' },
+  nav: { dashboard: 'Dashboard', portfolio: 'Portfolio', bonds: 'Bonds', marketBonds: 'Market bonds', watchlist: 'Watchlist', ai: 'AI' },
   dashboard: {
     title: 'Dashboard',
     aiReport: 'AI Report',
@@ -311,6 +329,15 @@ const en: TranslationKeys = {
     errorRateLimit: 'Rate limited. Try again later.',
     errorInvalidKey: 'Invalid MISTRAL_API_KEY',
     errorRequestFailed: 'Request failed',
+  },
+  marketBonds: {
+    title: 'Market bonds',
+    description: 'Bonds available on the market — for analyzing and comparing yield and duration.',
+    sourceLabel: 'Data scope',
+    sourceRf: 'Russia',
+    sourceIntl: 'International',
+    loading: 'Loading…',
+    noData: 'No data.',
   },
   notFound: { pageNotFound: 'Page not found.', backHome: 'Back to Dashboard' },
 };

@@ -3,6 +3,6 @@ uvicorn[standard]
 sqlalchemy
 pydantic
 httpx
-mistralai
+mistralai>=0.3,<1
 python-dotenv
 pytest
